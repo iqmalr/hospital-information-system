@@ -1,5 +1,7 @@
 package com.iqmalr.his.entity;
 
+import com.iqmalr.his.constant.Gender;
+import com.iqmalr.his.constant.MaritalStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,7 +27,7 @@ public class Patient {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Enum gender;
+    private Gender gender;
 
     private String phone;
 
@@ -46,7 +48,7 @@ public class Patient {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String maritalStatus;
+    private MaritalStatus maritalStatus;
 
     private String emergencyContact;
 }
