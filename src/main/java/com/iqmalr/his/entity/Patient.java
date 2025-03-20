@@ -12,6 +12,8 @@ import java.util.Date;
 @Table(name="m_patients")
 @Getter
 @Setter
+@ToString
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Patient {
