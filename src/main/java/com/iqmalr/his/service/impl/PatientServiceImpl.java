@@ -2,18 +2,21 @@ package com.iqmalr.his.service.impl;
 
 import com.iqmalr.his.entity.Patient;
 import com.iqmalr.his.model.request.PatientRequest;
+import com.iqmalr.his.model.request.SearchPatientRequest;
 import com.iqmalr.his.model.response.CommonResponse;
 import com.iqmalr.his.model.response.PagingResponse;
 import com.iqmalr.his.repository.PatientRepository;
 import com.iqmalr.his.service.PatientService;
+import com.iqmalr.his.spesification.PatientSpecification;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -60,22 +63,44 @@ public class PatientServiceImpl implements PatientService {
 
         return CommonResponse.<List<Patient>>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("")
+                .message("Patients retrieved successfully")
                 .data(patients)
+                .pagination(pagingResponse)
                 .build();
     }
     @Override
     public CommonResponse<Patient> getPatientById(String id) {
-        Optional<Patient> patient = patientRepository.findById(id);
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
 
-        return patient.map(value -> CommonResponse.<Patient>builder()
+
+        return CommonResponse.<Patient>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Patient retrieved successfully")
-                .data(value)
-                .build()
-        ).orElseGet(() -> CommonResponse.<Patient>builder()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .message("Patient not found")
-                .build());
+                .data(patient)
+                .build();
     }
+    @Override
+    public CommonResponse<List<Patient>> searchPatients(SearchPatientRequest request, Pageable pageable) {
+        Specification<Patient> spec = PatientSpecification.getSpecification(request);
+        Page<Patient> patientPage = patientRepository.findAll(spec, pageable);
+
+        List<Patient> patients = patientPage.getContent();
+
+        PagingResponse pagingResponse = PagingResponse.builder()
+                .totalPages(patientPage.getTotalPages())
+                .totalElement(patientPage.getTotalElements())
+                .page(patientPage.getNumber())
+                .size(patientPage.getSize())
+                .hasNext(patientPage.hasNext())
+                .hasPrevious(patientPage.hasPrevious())
+                .build();
+
+        return CommonResponse.<List<Patient>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Patients retrieved successfully")
+                .data(patients)
+                .build();
+    }
+
 }
