@@ -3,7 +3,14 @@ package com.iqmalr.his.service;
 import com.iqmalr.his.entity.Patient;
 import com.iqmalr.his.model.request.PatientRequest;
 import com.iqmalr.his.model.response.CommonResponse;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface PatientService {
     CommonResponse<Patient> createPatient(PatientRequest patientRequest);
+
+    CommonResponse<List<Patient>> getAllPatients(Pageable pageable);
+
+    CommonResponse<Patient> getPatientById(String id);
 }
