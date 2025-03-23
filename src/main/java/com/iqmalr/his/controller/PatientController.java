@@ -2,6 +2,7 @@ package com.iqmalr.his.controller;
 
 import com.iqmalr.his.entity.Patient;
 import com.iqmalr.his.model.request.PatientRequest;
+import com.iqmalr.his.model.request.SearchPatientRequest;
 import com.iqmalr.his.model.response.CommonResponse;
 import com.iqmalr.his.model.response.PatientResponse;
 import com.iqmalr.his.service.PatientService;
@@ -64,6 +65,21 @@ public class PatientController {
     )
     public ResponseEntity<CommonResponse<Patient>> getPatientById(@PathVariable String id) {
         CommonResponse<Patient> response = patientService.getPatientById(id);
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/search")
+    @Operation(
+            summary = "Mencari pasien berdasarkan filter",
+            description = "Mencari pasien berdasarkan kriteria pencarian tertentu",
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CommonResponse.class)))
+            }
+    )
+    public ResponseEntity<CommonResponse<List<Patient>>> searchPatients(
+            @RequestBody SearchPatientRequest request,
+            Pageable pageable
+    ) {
+        CommonResponse<List<Patient>> response = patientService.searchPatients(request, pageable);
         return ResponseEntity.ok(response);
     }
 }
