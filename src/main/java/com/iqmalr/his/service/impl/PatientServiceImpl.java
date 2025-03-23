@@ -5,6 +5,7 @@ import com.iqmalr.his.model.request.PatientRequest;
 import com.iqmalr.his.model.request.SearchPatientRequest;
 import com.iqmalr.his.model.response.CommonResponse;
 import com.iqmalr.his.model.response.PagingResponse;
+import com.iqmalr.his.model.response.PatientResponse;
 import com.iqmalr.his.repository.PatientRepository;
 import com.iqmalr.his.service.PatientService;
 import com.iqmalr.his.spesification.PatientSpecification;
@@ -48,9 +49,12 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public CommonResponse<List<Patient>> getAllPatients(Pageable pageable) {
+    public CommonResponse<List<PatientResponse>> getAllPatients(Pageable pageable) {
         Page<Patient> patientPage = patientRepository.findAll(pageable);
-        List<Patient> patients = patientPage.getContent();
+//        List<Patient> patients = patientPage.getContent();
+        List<PatientResponse> patients = patientPage.getContent().stream()
+                .map(PatientResponse::fromEntity)
+                .toList();
 
         PagingResponse pagingResponse = PagingResponse.builder()
                 .totalPages(patientPage.getTotalPages())
@@ -61,7 +65,7 @@ public class PatientServiceImpl implements PatientService {
                 .hasPrevious(patientPage.hasPrevious())
                 .build();
 
-        return CommonResponse.<List<Patient>>builder()
+        return CommonResponse.<List<PatientResponse>>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Patients retrieved successfully")
                 .data(patients)
