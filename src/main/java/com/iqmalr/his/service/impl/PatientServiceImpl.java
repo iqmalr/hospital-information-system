@@ -104,6 +104,7 @@ public class PatientServiceImpl implements PatientService {
                 .statusCode(HttpStatus.OK.value())
                 .message("Patients retrieved successfully")
                 .data(patients)
+                .pagination(pagingResponse)
                 .build();
     }
 

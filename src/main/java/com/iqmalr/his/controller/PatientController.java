@@ -7,13 +7,17 @@ import com.iqmalr.his.model.response.CommonResponse;
 import com.iqmalr.his.model.response.PatientResponse;
 import com.iqmalr.his.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,10 +53,20 @@ public class PatientController {
                     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CommonResponse.class)))
             }
     )
-    public ResponseEntity<CommonResponse<List<PatientResponse>>> getAllPatients(Pageable pageable) {
-        CommonResponse<List<PatientResponse>> response = patientService.getAllPatients(pageable);
+    public ResponseEntity<CommonResponse<List<PatientResponse>>> getAllPatients(
+            @ParameterObject Pageable pageable,
+            @Parameter(description = "Sorting field", example = "fullName,asc")
+            @RequestParam(defaultValue = "fullName,asc") String sort
+    ) {
+        String[] sortParams = sort.split(",");
+        Sort sorting = Sort.by(Sort.Direction.fromString(sortParams[1]), sortParams[0]);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sorting);
+
+        CommonResponse<List<PatientResponse>> response = patientService.getAllPatients(sortedPageable);
         return ResponseEntity.ok(response);
     }
+
+
 
     @GetMapping("/{id}")
     @Operation(
