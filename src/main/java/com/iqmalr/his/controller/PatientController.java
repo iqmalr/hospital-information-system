@@ -35,10 +35,11 @@ public class PatientController {
                     @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(implementation = CommonResponse.class)))
             }
     )
-    public ResponseEntity<CommonResponse<Patient>> createPatient(@Valid @RequestBody PatientRequest patientRequest){
-        CommonResponse<Patient> response=patientService.createPatient(patientRequest);
+    public ResponseEntity<CommonResponse<Patient>> createPatient(@Valid @RequestBody PatientRequest patientRequest) {
+        CommonResponse<Patient> response = patientService.createPatient(patientRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
     @GetMapping
     @Operation(
             summary = "Mendapatkan daftar pasien",
@@ -52,4 +53,17 @@ public class PatientController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{id}")
+    @Operation(
+            summary = "Mendapatkan pasien berdasarkan ID",
+            description = "Mengambil data pasien berdasarkan ID yang diberikan",
+            responses = {
+                    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+                    @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = CommonResponse.class)))
+            }
+    )
+    public ResponseEntity<CommonResponse<Patient>> getPatientById(@PathVariable String id) {
+        CommonResponse<Patient> response = patientService.getPatientById(id);
+        return ResponseEntity.ok(response);
+    }
 }
